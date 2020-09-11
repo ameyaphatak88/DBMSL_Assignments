@@ -1,0 +1,161 @@
+Create views, index, sequence, synonym 
+
+ 
+
+1)View 
+
+Create a view 
+
+mysql> create or replace view view_pune as select cust_no, cust_fname, cust_lname, cust_addr from Customer where city = "Pune"; 
+
+Query OK, 0 rows affected (0.12 sec) 
+
+  
+
+View 
+
+mysql> select * from view_pune; 
+
++---------+------------+------------+-----------+ 
+
+| cust_no | cust_fname | cust_lname | cust_addr | 
+
++---------+------------+------------+-----------+ 
+
+|       1 | Ameya      | Phatak     | Kothrud   | 
+
+|       2 | Aneesh     | Phatak     | Kothrud   | 
+
+|       6 | Aditya     | Mandke     | Kothrud   | 
+
+|       7 | Praneel    | Mahajan    | PaudRd    | 
+
+|       8 | Shaunak    | Halbe      | KarveNag  | 
+
+|       9 | Manoj      | Phatak     | Kothrud   | 
+
+|      11 | Sangram    | Yamgar     | Kothrud   | 
+
++---------+------------+------------+-----------+ 
+
+7 rows in set (0.00 sec) 
+
+  
+
+Update view 
+
+mysql> update view_pune 
+
+    -> set cust_addr = "KarveNag" 
+
+    -> where cust_no = 11; 
+
+Query OK, 1 row affected (0.07 sec) 
+
+Rows matched: 1  Changed: 1  Warnings: 0 
+
+  
+
+mysql> select * from view_pune; 
+
++---------+------------+------------+-----------+ 
+
+| cust_no | cust_fname | cust_lname | cust_addr | 
+
++---------+------------+------------+-----------+ 
+
+|       1 | Ameya      | Phatak     | Kothrud   | 
+
+|       2 | Aneesh     | Phatak     | Kothrud   | 
+
+|       6 | Aditya     | Mandke     | Kothrud   | 
+
+|       7 | Praneel    | Mahajan    | PaudRd    | 
+
+|       8 | Shaunak    | Halbe      | KarveNag  | 
+
+|       9 | Manoj      | Phatak     | Kothrud   | 
+
+|      11 | Sangram    | Yamgar     | KarveNag  | 
+
++---------+------------+------------+-----------+ 
+
+7 rows in set (0.00 sec) 
+
+  
+
+Drop view 
+
+mysql> drop view_pune; 
+
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'view_pune' at line 1 
+
+mysql> drop view view_pune; 
+
+Query OK, 0 rows affected (0.00 sec) 
+
+  
+
+ 
+
+2) index 
+
+Create a single index 
+
+mysql> create index ind1 
+
+    -> on Customer(cust_fname); 
+
+Query OK, 0 rows affected, 1 warning (0.44 sec) 
+
+Records: 0  Duplicates: 0  Warnings: 1 
+
+  
+
+Display index 
+
+mysql> show index from Customer; 
+
++----------+------------+--------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+ 
+
+| Table    | Non_unique | Key_name           | Seq_in_index | Column_name | Collation | Cardinality | Sub_part | Packed | Null | Index_type | Comment | Index_comment | 
+
++----------+------------+--------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+ 
+
+| Customer |          0 | PRIMARY            |            1 | cust_no     | A         |          10 |     NULL | NULL   |      | BTREE      |         |               | 
+
+| Customer |          0 | unique_index_city  |            1 | cust_no     | A         |          10 |     NULL | NULL   |      | BTREE      |         |               | 
+
+| Customer |          0 | unique_index_city  |            2 | city        | A         |          10 |     NULL | NULL   | YES  | BTREE      |         |               | 
+
+| Customer |          1 | single_index_fname |            1 | cust_fname  | A         |          10 |     NULL | NULL   | YES  | BTREE      |         |               | 
+
+| Customer |          1 | ind1               |            1 | cust_fname  | A         |          10 |     NULL | NULL   | YES  | BTREE      |         |               | 
+
++----------+------------+--------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+ 
+
+5 rows in set (0.00 sec) 
+
+ 
+
+Create a complex index 
+
+ mysql> create index ind2 
+
+    -> on Customer(cust_fname, cust_lname, city); 
+
+Query OK, 0 rows affected (0.38 sec) 
+
+Records: 0  Duplicates: 0  Warnings: 0 
+
+  
+
+Create a unique index 
+
+mysql> create unique index ind3 on Customer(cust_fname, cust_lname); 
+
+Query OK, 0 rows affected (1.34 sec) 
+
+Records: 0  Duplicates: 0  Warnings: 0 
+
+ 
