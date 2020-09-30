@@ -1,0 +1,251 @@
+mysql> show tables; 
+
++--------------+ 
+
+| Tables_in_a5 | 
+
++--------------+ 
+
+| customer     | 
+
+| fine         | 
+
++--------------+ 
+
+2 rows in set (0.00 sec) 
+
+  
+
+mysql> delimiter $$ 
+
+mysql> create procedure calfine(in cid int) 
+
+    -> begin 
+
+    -> declare p_date date; 
+
+    -> declare f_amt int; 
+
+    -> declare diff int; 
+
+    ->  
+
+    -> declare exit handler for sqlexception select 'Table not found'; 
+
+    -> select dop into p_date from customer where cust_id = cid; 
+
+    -> select datediff(curdate(), p_date) into diff; 
+
+    ->  
+
+    -> if (diff >= 15 and diff <= 30) then 
+
+    -> set f_amt = diff*5; 
+
+    -> insert into fine values (cid, CURDATE(), f_amt); 
+
+    -> elseif (diff > 30) then 
+
+    -> set f_amt = diff*50; 
+
+    -> insert into fine values (cid, CURDATE(), f_amt); 
+
+    -> end if; 
+
+    -> update customer set status = 'P' where cust_id = cid; 
+
+    -> end; 
+
+    -> $$ 
+
+Query OK, 0 rows affected (0.39 sec) 
+
+  
+
+mysql> select * from fine; 
+
+    -> $$ 
+
+Empty set (0.00 sec) 
+
+  
+
+mysql> insert into customer values(1, "G MAXWELL", 2020-09-20, "AA", "N"); 
+
+    -> $$ 
+
+ERROR 1292 (22007): Incorrect date value: '1991' for column 'dop' at row 1 
+
+mysql> insert into customer values(1, "G MAXWELL", "2020-09-20", "AA", "N"); 
+
+    -> $$ 
+
+Query OK, 1 row affected (0.04 sec) 
+
+  
+
+mysql> insert into customer values(2, "R SHARMA", "2020-09-01", "AA", "N"); 
+
+    -> $$ 
+
+Query OK, 1 row affected (0.14 sec) 
+
+  
+
+mysql> insert into customer values(3, "V KOLHI", "2020-08-08", "AA", "N"); 
+
+    -> $$ 
+
+Query OK, 1 row affected (0.36 sec) 
+
+  
+
+mysql> select * from customer; 
+
+    -> $$ 
+
++---------+-----------+------------+------+--------+ 
+
+| cust_id | name      | dop        | nos  | status | 
+
++---------+-----------+------------+------+--------+ 
+
+|       1 | G MAXWELL | 2020-09-20 | AA   | N      | 
+
+|       2 | R SHARMA  | 2020-09-01 | AA   | N      | 
+
+|       3 | V KOLHI   | 2020-08-08 | AA   | N      | 
+
++---------+-----------+------------+------+--------+ 
+
+3 rows in set (0.00 sec) 
+
+  
+
+mysql> select * from fine; 
+
+    -> $$ 
+
+Empty set (0.00 sec) 
+
+  
+
+mysql> call calfine(1); 
+
+    -> $$ 
+
+Query OK, 1 row affected (0.13 sec) 
+
+  
+
+mysql> select * from fine; 
+
+    -> $$ 
+
+Empty set (0.00 sec) 
+
+  
+
+mysql> call calfine(2); 
+
+    -> $$ 
+
+Query OK, 1 row affected (0.15 sec) 
+
+  
+
+mysql> select * from fine; 
+
+    -> $$ 
+
++---------+------------+------+ 
+
+| cust_id | dat        | amt  | 
+
++---------+------------+------+ 
+
+|       2 | 2020-09-27 |  130 | 
+
++---------+------------+------+ 
+
+1 row in set (0.00 sec) 
+
+  
+
+mysql> callfine(3); 
+
+    -> $$ 
+
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'callfine(3)' at line 1 
+
+mysql> calfine(3); 
+
+    -> $$ 
+
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'calfine(3)' at line 1 
+
+mysql> call calfine(3); 
+
+    -> $$ 
+
+Query OK, 1 row affected (0.48 sec) 
+
+  
+
+mysql> select * from fine; 
+
+    -> $$ 
+
++---------+------------+------+ 
+
+| cust_id | dat        | amt  | 
+
++---------+------------+------+ 
+
+|       2 | 2020-09-27 |  130 | 
+
+|       3 | 2020-09-27 | 2500 | 
+
++---------+------------+------+ 
+
+2 rows in set (0.00 sec) 
+
+  
+
+mysql> insert into customer values(4, "ABDE VILLIERS", "2020-07-07", "AA", "N"); 
+
+    -> $$ 
+
+Query OK, 1 row affected (0.13 sec) 
+
+  
+
+mysql> call calfine(4);$$ 
+
+Query OK, 1 row affected (0.15 sec) 
+
+  
+
+mysql> select * from fine; 
+
+    -> $$ 
+
++---------+------------+------+ 
+
+| cust_id | dat        | amt  | 
+
++---------+------------+------+ 
+
+|       2 | 2020-09-27 |  130 | 
+
+|       3 | 2020-09-27 | 2500 | 
+
+|       4 | 2020-09-27 | 4100 | 
+
++---------+------------+------+ 
+
+3 rows in set (0.00 sec) 
+
+  
+
+ 

@@ -1,0 +1,421 @@
+mysql> create table old(id int, name varchar(15)); 
+
+Query OK, 0 rows affected (0.33 sec) 
+
+  
+
+mysql> create table new(id int, name varchar(15)); 
+
+Query OK, 0 rows affected (0.34 sec) 
+
+  
+
+mysql> show tables; 
+
++--------------+ 
+
+| Tables_in_a6 | 
+
++--------------+ 
+
+| new          | 
+
+| old          | 
+
++--------------+ 
+
+2 rows in set (0.00 sec) 
+
+  
+
+mysql> insert into old values(1, "SACHIN"); 
+
+Query OK, 1 row affected (0.13 sec) 
+
+  
+
+mysql> insert into old values(2, "DHONI"); 
+
+Query OK, 1 row affected (0.11 sec) 
+
+  
+
+mysql> insert into old values(3, "KOLHI"); 
+
+Query OK, 1 row affected (0.12 sec) 
+
+  
+
+mysql> insert into old values(4, "MAXWELL"); 
+
+Query OK, 1 row affected (0.12 sec) 
+
+  
+
+mysql> insert into old values(4, "DALE STEYN"); 
+
+Query OK, 1 row affected (0.12 sec) 
+
+  
+
+mysql> delete from old where name = "DALE STEYN"; 
+
+Query OK, 1 row affected (0.12 sec) 
+
+  
+
+mysql> select * from old; 
+
++------+---------+ 
+
+| id   | name    | 
+
++------+---------+ 
+
+|    1 | SACHIN  | 
+
+|    2 | DHONI   | 
+
+|    3 | KOLHI   | 
+
+|    4 | MAXWELL | 
+
++------+---------+ 
+
+4 rows in set (0.00 sec) 
+
+  
+
+mysql> insert into old values(5, "DALE STEYN"); 
+
+Query OK, 1 row affected (0.10 sec) 
+
+  
+
+mysql> insert into old values(6, "WILLIAMSON"); 
+
+Query OK, 1 row affected (0.16 sec) 
+
+  
+
+mysql> select * from old; 
+
++------+------------+ 
+
+| id   | name       | 
+
++------+------------+ 
+
+|    1 | SACHIN     | 
+
+|    2 | DHONI      | 
+
+|    3 | KOLHI      | 
+
+|    4 | MAXWELL    | 
+
+|    5 | DALE STEYN | 
+
+|    6 | WILLIAMSON | 
+
++------+------------+ 
+
+6 rows in set (0.00 sec) 
+
+  
+
+mysql> insert into new values(1, "SACHIN"); 
+
+Query OK, 1 row affected (0.04 sec) 
+
+  
+
+mysql> insert into new values(3, "KOLHI"); 
+
+Query OK, 1 row affected (0.12 sec) 
+
+  
+
+mysql> insert into new values(4, "DALE STEYN"); 
+
+Query OK, 1 row affected (0.38 sec) 
+
+  
+
+mysql> select * from new; 
+
++------+------------+ 
+
+| id   | name       | 
+
++------+------------+ 
+
+|    1 | SACHIN     | 
+
+|    3 | KOLHI      | 
+
+|    4 | DALE STEYN | 
+
++------+------------+ 
+
+3 rows in set (0.00 sec) 
+
+  
+
+mysql> delete from new where name = "DALE STEYN"; 
+
+Query OK, 1 row affected (0.38 sec) 
+
+  
+
+mysql> insert into new values(5, "DALE STEYN"); 
+
+Query OK, 1 row affected (0.12 sec) 
+
+  
+
+mysql> select * from new; 
+
++------+------------+ 
+
+| id   | name       | 
+
++------+------------+ 
+
+|    1 | SACHIN     | 
+
+|    3 | KOLHI      | 
+
+|    5 | DALE STEYN | 
+
++------+------------+ 
+
+3 rows in set (0.00 sec) 
+
+  
+
+mysql> select * from old; 
+
++------+------------+ 
+
+| id   | name       | 
+
++------+------------+ 
+
+|    1 | SACHIN     | 
+
+|    2 | DHONI      | 
+
+|    3 | KOLHI      | 
+
+|    4 | MAXWELL    | 
+
+|    5 | DALE STEYN | 
+
+|    6 | WILLIAMSON | 
+
++------+------------+ 
+
+6 rows in set (0.00 sec) 
+
+ 
+
+mysql> create procedure old_new_merge() 
+
+    -> begin 
+
+    -> declare flag int; 
+
+    -> declare old_empID int; 
+
+    -> declare new_empID int; 
+
+    -> declare old_empName varchar(15); 
+
+    -> declare new_empName varchar(15); 
+
+    ->  
+
+    -> declare exit_loop boolean default false; 
+
+    -> declare c1 cursor for select * from old; 
+
+    -> declare c2 cursor for select * from new; 
+
+    -> declare continue handler for not found set exit_loop = TRUE; 
+
+    ->  
+
+    -> open c1; 
+
+    -> oemp_loop: loop 
+
+    -> set flag = 0; 
+
+    -> fetch c1 into old_empID, old_empName; 
+
+    -> if exit_loop then 
+
+    -> close c1; 
+
+    -> leave oemp_loop; 
+
+    -> end if; 
+
+    ->  
+
+    -> open c2; 
+
+    -> nemp_loop: loop 
+
+    -> fetch c2 into new_empID, new_empName; 
+
+    -> if exit_loop then 
+
+    -> set exit_loop = false; 
+
+    -> close c2; 
+
+    -> leave nemp_loop; 
+
+    -> end if; 
+
+    -> if old_empID = new_empID then 
+
+    -> set flag = 1; 
+
+    -> end if; 
+
+    -> end loop nemp_loop; 
+
+    ->  
+
+    -> if flag = 0 then 
+
+    -> insert into new values(old_empID, old_empName); 
+
+    -> end if; 
+
+    ->  
+
+    -> end loop oemp_loop; 
+
+    -> end 
+
+    -> @ 
+
+Query OK, 0 rows affected (0.08 sec) 
+
+  
+
+mysql> select * from new; 
+
+    -> @ 
+
++------+------------+ 
+
+| id   | name       | 
+
++------+------------+ 
+
+|    1 | SACHIN     | 
+
+|    3 | KOLHI      | 
+
+|    5 | DALE STEYN | 
+
++------+------------+ 
+
+3 rows in set (0.00 sec) 
+
+  
+
+mysql> select * from old; 
+
+    -> @ 
+
++------+------------+ 
+
+| id   | name       | 
+
++------+------------+ 
+
+|    1 | SACHIN     | 
+
+|    2 | DHONI      | 
+
+|    3 | KOLHI      | 
+
+|    4 | MAXWELL    | 
+
+|    5 | DALE STEYN | 
+
+|    6 | WILLIAMSON | 
+
++------+------------+ 
+
+6 rows in set (0.00 sec) 
+
+  
+
+mysql> call old_new_merge(); 
+
+    -> @ 
+
+Query OK, 0 rows affected (0.23 sec) 
+
+  
+
+mysql> select * from old; 
+
+    -> @ 
+
++------+------------+ 
+
+| id   | name       | 
+
++------+------------+ 
+
+|    1 | SACHIN     | 
+
+|    2 | DHONI      | 
+
+|    3 | KOLHI      | 
+
+|    4 | MAXWELL    | 
+
+|    5 | DALE STEYN | 
+
+|    6 | WILLIAMSON | 
+
++------+------------+ 
+
+6 rows in set (0.00 sec) 
+
+  
+
+mysql> select * from new; 
+
+    -> @ 
+
++------+------------+ 
+
+| id   | name       | 
+
++------+------------+ 
+
+|    1 | SACHIN     | 
+
+|    3 | KOLHI      | 
+
+|    5 | DALE STEYN | 
+
+|    2 | DHONI      | 
+
+|    4 | MAXWELL    | 
+
+|    6 | WILLIAMSON | 
+
++------+------------+ 
+
+6 rows in set (0.00 sec) 
